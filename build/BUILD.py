@@ -19,14 +19,19 @@ def main():
     titles = set()
     uninteresting_titles = set()
 
-    lines = iter(gzip.open('genres.list.gz'))
+    try:
+        file = 'genres.list.gz'
+        lines = iter(gzip.open(file))
+    except IOError:                         # No compressed file. Open uncompressed
+        file = 'genres.list'
+        lines = iter(open(file))
     line = next(lines)
     while line != b'8: THE GENRES LIST\n':
         line = next(lines)
     assert next(lines) == b'==================\n'
     assert next(lines) == b'\n'
 
-    print('Reading "genres.list.gz" to find interesting movies')
+    print('Reading "{:}" to find interesting movies'.format(file))
 
     for line in lines:
         if not_a_real_movie(line):
@@ -64,7 +69,13 @@ def main():
     print('Finished writing "titles.csv"')
     print('Reading release dates from "release-dates.list.gz"')
 
-    lines = iter(gzip.open('release-dates.list.gz'))
+    try:
+        file = 'release-dates.list.gz'
+        lines = iter(gzip.open(file))
+    except IOError:                         # No compressed file. Open uncompressed
+        file = 'release-dates.list'
+        lines = iter(open(file))
+    print('Reading "{:}"'.format(file))
     line = next(lines)
     while line != b'RELEASE DATES LIST\n':
         line = next(lines)
@@ -109,7 +120,12 @@ def main():
             ('actress', 'actresses.list.gz'),
             ):
         print('Reading {0!r}'.format(filename))
-        lines = iter(gzip.open(filename))
+        try:
+            lines = iter(gzip.open(filename))
+        except:                             # No compressed file. Open uncompressed
+            filename = filename[:-3]
+            lines = iter(open(filename))
+        print('Reading "{:}" to find interesting movies'.format(filename))
 
         line = next(lines)
         while (b'Name' not in line) or (b'Titles' not in line):
